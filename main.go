@@ -21,6 +21,6 @@ func main() {
 			}
 		})
 
-	log.Println("Listening on port " + port)
+	log.Println("Listening on port: " + port)
 	http.ListenAndServe(":"+port, nil)
 }
