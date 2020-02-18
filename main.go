@@ -19,6 +19,8 @@ func main() {
 			for _, e := range os.Environ() {
 				fmt.Fprintln(w, e)
 			}
+			fmt.Fprintln(w)
+			fmt.Fprintln(w, " -- Source of this service: https://github.com/wietsevenema/inspect --")
 		})
 
 	log.Println("Listening on port: " + port)
