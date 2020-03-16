@@ -9,6 +9,6 @@ steps:
         "run", "deploy", "inspect",
         "--image","gcr.io/$PROJECT_ID/inspect",
         "--platform","managed",
-        "--region", "europe-west1",
+        "--region", "us-central1",
         "--allow-unauthenticated",
       ]
