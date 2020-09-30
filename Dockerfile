@@ -1,15 +1,14 @@
-FROM golang:1.13 AS gobuilder
+FROM golang:1.15 as build
 
-WORKDIR /app
-COPY main.go main.go
+WORKDIR /src
+COPY go.* ./
+RUN go mod download
 
+COPY . .
 ENV CGO_ENABLED 0
-ENV GOOS linux
-ENV GOARCH amd64
-RUN go build main.go
+ARG VERSION
+RUN go build -ldflags "-X main.version=${VERSION}" -o /go/bin/app 
 
-FROM gcr.io/distroless/base
-WORKDIR /app
-COPY --from=gobuilder /app/main /app/main
-
-ENTRYPOINT ["./main"]
+FROM gcr.io/distroless/static:nonroot 
+COPY --from=build /go/bin/app /
+ENTRYPOINT ["/app"]
