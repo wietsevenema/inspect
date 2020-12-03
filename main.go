@@ -1,16 +1,30 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"sort"
+	"strings"
+	"text/template"
+
+	sigar "github.com/cloudfoundry/gosigar"
+	human "github.com/dustin/go-humanize"
 )
 
 var version = "DEVELOP"
 
+type Data struct {
+	Version string
+	Environ map[string]string
+	Headers map[string]string
+	Memory  sigar.Mem
+	FsList  sigar.FileSystemList
+	Uptime  string
+}
+
 func main() {
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
@@ -18,32 +32,54 @@ func main() {
 
 	http.HandleFunc("/",
 		func(w http.ResponseWriter, r *http.Request) {
-			fmt.Fprintf(w, "VERSION: %s", version)
-			fmt.Fprintln(w)
-			fmt.Fprintln(w, r.Host)
-			fmt.Fprintln(w)
-			fmt.Fprintln(w, "ENV VARS\n========")
+			tmpl := template.Must(template.New("index.html").
+				Funcs(template.FuncMap{
+					"human": func(b uint64) string {
+						return human.IBytes(b)
+					}}).ParseFiles("index.html"))
+
+			data := Data{
+				Version: version,
+				Environ: make(map[string]string),
+				Headers: make(map[string]string),
+			}
 			for _, e := range os.Environ() {
-				fmt.Fprintln(w, e)
+				r := strings.SplitN(e, "=", 2)
+				if len(r) == 2 {
+					v := r[1]
+					if len(v) > 75 {
+						v = v[:75] + "..."
+					}
+					data.Environ[r[0]] = v
+				}
 			}
-			fmt.Fprintln(w)
-			fmt.Fprintln(w, "HTTP HEADERS\n============")
-			for k, v := range r.Header {
-				fmt.Fprintln(w, k, v)
+			headerKeys := []string{}
+			for k := range r.Header {
+				headerKeys = append(headerKeys, k)
+			}
+			sort.Strings(headerKeys)
+			for _, k := range headerKeys {
+				vals := r.Header[k]
+				v := strings.Join(vals, ", ")
+				if len(v) > 75 {
+					v = v[:75] + "..."
+				}
+				data.Headers[k] = v
 			}
 
-			fmt.Fprintln(w)
+			data.Memory = sigar.Mem{}
+			data.Memory.Get()
 
-			//FIXME: print GCP metadata info
-			//FIXME: print instance stats: nr of req received
-			//FIXME: print system stats (cpu mem)
+			uptime := sigar.Uptime{}
+			uptime.Get()
+			data.Uptime = uptime.Format()
 
-			fmt.Fprintln(w, " -- Source of this service: https://github.com/wietsevenema/inspect --")
-			if r.Method == http.MethodPost {
-				var p interface{}
-				json.NewDecoder(r.Body).Decode(&p)
-				log.Print(p)
-			}
+			tmpl.Execute(w, data)
+
+			// //FIXME: print GCP metadata info
+			// //FIXME: print instance stats: nr of req received
+			// //FIXME: print system stats (cpu mem)
+
 		})
 
 	log.Println("Started version: " + version)

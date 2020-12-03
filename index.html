@@ -1,0 +1,66 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link href="https://unpkg.com/tailwindcss@^2/dist/tailwind.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/@tailwindcss/typography@0.2.x/dist/typography.min.css" />
+</head>
+<body>
+    <article class="prose prose-sm container mx-auto">
+        <h1>Version: {{.Version}}</h1>
+        <p><a href="https://github.com/wietsevenema/inspect">gcr.io/cloud-run-book/inspect</a></p>
+        <h2>About This System</h2>
+        <table class="table-fixed">
+            <tbody>
+                <!-- <tr>
+                    <th>Memory</th>
+                    <td>{{human .Memory.Total}}</td>
+                </tr> -->
+                <tr>
+                    <th>Uptime</th>
+                    <td>{{ .Uptime }}</td>
+                </tr>
+            </tbody>
+        </table>
+        <!-- <h2>Cloud Run</h2>
+        <p>Pending..</p> -->
+        <h2>Environment Variables</h2>
+        <table class="table-fixed">
+            <thead>
+              <tr>
+                <th class="w-1/8">Key</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{range $key, $value := .Environ}}
+              <tr>
+                  <td>{{$key}}</td>
+                  <td>{{$value}}</td>
+              </tr>                
+              {{end}}
+            </tbody>
+        </table>
+        
+        <h2>Request Headers</h2>
+        <table class="table-fixed">
+            <thead>
+              <tr>
+                <th class="w-1/8">Key</th>
+                <th>Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{range $key, $value := .Headers}}
+              <tr>
+                  <td>{{$key}}</td>
+                  <td>{{$value}}</td>
+              </tr>                
+              {{end}}
+            </tbody>
+        </table>
+        <!-- <h2>About This Service</h2> -->
+</article>
+</body>
+</html>
