@@ -10,21 +10,42 @@
     <article class="prose prose-sm container mx-auto">
         <h1>Version: {{.Version}}</h1>
         <p><a href="https://github.com/wietsevenema/inspect">gcr.io/cloud-run-book/inspect</a></p>
-        <h2>About This System</h2>
+        <h2>About</h2>
         <table class="table-fixed">
             <tbody>
-                <!-- <tr>
-                    <th>Memory</th>
-                    <td>{{human .Memory.Total}}</td>
-                </tr> -->
+                <tr>
+                    <th>Total Memory</th>
+                    <td>{{human .TotalMemory}}</td>
+                </tr>
                 <tr>
                     <th>Uptime</th>
                     <td>{{ .Uptime }}</td>
                 </tr>
+                {{if .OnGoogleCloud}}
+                <tr>
+                  <th>vCPUs</th>
+                  <td>{{.VCPU}}</td>
+                </tr>
+                <tr>
+                  <th>Region</th>
+                  <td>{{.Region}}</td>
+                </tr>
+                <tr>
+                  <th>Service account</th>
+                  <td>{{.ServiceAccount}}</td>
+                </tr>
+                <tr>
+                  <th>Instance ID</th>
+                  <td>{{.InstanceID}}</td>
+                </tr>
+                <tr>
+                  <th>Project</th>
+                  <td>{{.ProjectID}}</td>
+                </tr>
+                {{end}}
             </tbody>
         </table>
-        <!-- <h2>Cloud Run</h2>
-        <p>Pending..</p> -->
+      
         <h2>Environment Variables</h2>
         <table class="table-fixed">
             <thead>

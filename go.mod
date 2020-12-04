@@ -3,6 +3,7 @@ module github.com/wietsevenema/inspect
 go 1.15
 
 require (
+	cloud.google.com/go v0.72.0
 	github.com/cloudfoundry/gosigar v1.1.0
 	github.com/dustin/go-humanize v1.0.0
 	github.com/onsi/ginkgo v1.14.2 // indirect
